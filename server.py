@@ -46,7 +46,7 @@ def positionbyID():
 
     return jsonify(jsonforResponse)
 
-@app.route('/unitsabilable')
+@app.route('/unitsavailable')
 def unitsabilable():
     db = get_db()
     cursor = db.cursor()
@@ -59,6 +59,23 @@ def unitsabilable():
             counterForResponse=counterForResponse+1
         else:
             jsonforResponse['idUnidad'].append(row[0])
+            counterForResponse=counterForResponse+1
+    cursor.close()
+    return jsonify(jsonforResponse)
+
+@app.route('/alcaldiasavailable')
+def alcaldiasavailable():
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("select alcaldia from datosdummy group by alcaldia")
+    result = cursor.fetchall()
+    counterForResponse=0
+    for row in result:
+        if counterForResponse == 0:
+            jsonforResponse={"idUnidad":[row[0]],}
+            counterForResponse=counterForResponse+1
+        else:
+            jsonforResponse['alcaldias'].append(row[0])
             counterForResponse=counterForResponse+1
     cursor.close()
     return jsonify(jsonforResponse)
