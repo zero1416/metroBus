@@ -72,10 +72,31 @@ def alcaldiasavailable():
     counterForResponse=0
     for row in result:
         if counterForResponse == 0:
-            jsonforResponse={"idUnidad":[row[0]],}
+            jsonforResponse={"alcaldias":[row[0]],}
             counterForResponse=counterForResponse+1
         else:
             jsonforResponse['alcaldias'].append(row[0])
             counterForResponse=counterForResponse+1
     cursor.close()
+    return jsonify(jsonforResponse)
+
+@app.route('/unitsperalcaldia')
+def unitsperalcaldia():
+    nombreDeAlcaldia=request.args.get('alcaldia', default = "default")
+    if(nombreDeAlcaldia == "default"):
+        errorMessage="error in request trukId is required"
+    else:
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("select idunidad from datosdummy where alcaldia='"+nombreDeAlcaldia+"' group by idunidad")
+        result = cursor.fetchall()
+        counterForResponse=0
+        for row in result:
+            if counterForResponse == 0:
+                jsonforResponse={"alcaldia":nombreDeAlcaldia, "idUnidesdes": [row[0]]}
+                counterForResponse=counterForResponse+1
+            else:
+                jsonforResponse['idUnidesdes'].append(row[0])
+                counterForResponse=counterForResponse+1
+        cursor.close()
     return jsonify(jsonforResponse)
