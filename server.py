@@ -60,6 +60,5 @@ def unitsabilable():
         else:
             jsonforResponse['idUnidad'].append(row[0])
             counterForResponse=counterForResponse+1
-    print (result)
     cursor.close()
     return jsonify(jsonforResponse)
