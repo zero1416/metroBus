@@ -5,7 +5,7 @@ import time
 
 r = requests.get('https://datos.cdmx.gob.mx/api/records/1.0/search/?dataset=prueba_fetchdata_metrobus&q=&rows=50')
 jsonDerespuestaMetrobus=r.json()
-ArrayOfAlcaldias=["Iztapalapa", "Iztacalco"]
+ArrayOfAlcaldias=["Iztapalapa", "Iztacalco","Tlalpan","Miguel Hidalgo","Gustavo A. Madero","Benito Juárez","Coyoacán","Cuauhtémoc","Venustiano Carranza","Azcapotzalco"]
 for numeroDeRegistro in  jsonDerespuestaMetrobus['records']:
     idveiculo= numeroDeRegistro['fields']['vehicle_id']
     longitud= numeroDeRegistro['fields']['position_longitude']
@@ -13,7 +13,7 @@ for numeroDeRegistro in  jsonDerespuestaMetrobus['records']:
     fecha=numeroDeRegistro['fields']['date_updated']
     print("request antes de enviar a google")
     latitudAndlogtitudForRequest=str(latitud)+','+str(longitud)
-    requestValuesFromGoogle={'latlng': latitudAndlogtitudForRequest,'key':'AIzaSyBQg9vVv4o0N_irDSr-szoVIS8FSTu2bLU'}
+    requestValuesFromGoogle={'latlng': latitudAndlogtitudForRequest,'key':''}
     print(requestValuesFromGoogle)
     requestAlcaldia=requests.get('https://maps.googleapis.com/maps/api/geocode/json', params=requestValuesFromGoogle)
     jsonDerespuestaAlcaldia=requestAlcaldia.json()
@@ -22,12 +22,13 @@ for numeroDeRegistro in  jsonDerespuestaMetrobus['records']:
     arrayofAddress=fullAddress.split(',')
     print(arrayofAddress)
     timestampFromRequest=time.mktime(datetime.datetime.strptime(fecha, "%Y-%m-%d %H:%M:%S").timetuple())
-    if arrayofAddress[2].strip() in ArrayOfAlcaldias:
-        print("mensaje")
     if not(arrayofAddress[2].strip() in ArrayOfAlcaldias):
-        print("no mensaje")
+        fullAddress=jsonDerespuestaAlcaldia['results'][0]['formatted_address']
+        arrayofAddress=fullAddress.split(',')
+        print("delegacion no valida nueva delegacion:"+arrayofAddress[2])
+        #arrayofAddress[2]="default"
     try:
-        connection = psycopg2.connect(user="postgres",password="postgres",host="127.0.0.1",port="5432",database="postgres")
+        connection = psycopg2.connect(user="postgres",password="postgres",host="db",port="5432",database="postgres")
 
         cursor = connection.cursor()
         postgres_insert_query = """ INSERT INTO datosdummy (idunidad, latitud, longitud,timestamp,alcaldia) VALUES (%s,%s,%s,%s,%s)"""
